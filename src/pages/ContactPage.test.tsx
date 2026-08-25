@@ -30,6 +30,7 @@ describe("ContactPage form validation", () => {
       "href",
       "mailto:youssef.samier@tahweel.com"
     );
+    expect(screen.getByText("Jeddah, Saudi Arabia")).toBeInTheDocument();
   });
 
   it("shows validation errors when submitting an empty form", async () => {

@@ -119,7 +119,7 @@ export default function ContactPage() {
             value="youssef.samier@tahweel.com"
             href="mailto:youssef.samier@tahweel.com"
           />
-          <ContactItem icon={MapPin} label="Address" value="Riyadh, Saudi Arabia" />
+          <ContactItem icon={MapPin} label="Address" value="Jeddah, Saudi Arabia" />
         </div>
       </div>
     </div>
