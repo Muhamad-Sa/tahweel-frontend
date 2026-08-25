@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { BriefcaseBusiness, Mail, MapPin, Phone, UserRound } from "lucide-react";
+import { BriefcaseBusiness, Mail, MapPin, MessageCircle, Phone, UserRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -40,12 +40,40 @@ const INQUIRY_TYPES: { value: ContactFormValues["inquiry_type"]; label: string }
   { value: "distributor", label: "Distributor / partnership" },
 ];
 
-export default function ContactPage() {
+const YOUSSEF_WHATSAPP_NUMBER = "966558567576";
+
+export function buildWhatsAppUrl(values: ContactFormValues) {
+  const inquiryLabel =
+    INQUIRY_TYPES.find((type) => type.value === values.inquiry_type)?.label ?? values.inquiry_type;
+  const lines = [
+    "Hello Youssef,",
+    "",
+    "I submitted an inquiry through the Tahweel website.",
+    "",
+    `Name: ${values.name}`,
+    `Email: ${values.email}`,
+    `Phone: ${values.phone || "-"}`,
+    `Company: ${values.company || "-"}`,
+    `Country: ${values.country || "-"}`,
+    `Inquiry type: ${inquiryLabel}`,
+    `Project: ${values.project_name || "-"}`,
+    "",
+    "Message:",
+    values.message,
+  ];
+
+  return `https://wa.me/${YOUSSEF_WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`;
+}
+
+export default function ContactPage({
+  navigateToWhatsApp = (url) => window.location.assign(url),
+}: {
+  navigateToWhatsApp?: (url: string) => void;
+}) {
   const toast = useToast();
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
@@ -55,8 +83,8 @@ export default function ContactPage() {
   const onSubmit = async (values: ContactFormValues) => {
     try {
       await api.contact.submit(values);
-      toast.push("Thanks — your message has been sent. Our team will respond shortly.", "success");
-      reset({ inquiry_type: "general" } as ContactFormValues);
+      toast.push("Your inquiry was saved. Opening WhatsApp so you can send it to Youssef.", "success");
+      navigateToWhatsApp(buildWhatsAppUrl(values));
     } catch (err: any) {
       const detail = err?.response?.data;
       const message =
@@ -105,14 +133,23 @@ export default function ContactPage() {
             error={errors.message?.message}
           />
           <Button type="submit" size="lg" loading={isSubmitting} className="self-start">
-            Send message
+            <MessageCircle className="h-5 w-5" aria-hidden="true" />
+            Send via WhatsApp
           </Button>
+          <p className="-mt-2 text-xs text-charcoal-500">
+            Your inquiry will be saved, then WhatsApp will open with the message ready to send.
+          </p>
         </form>
 
         <div className="flex flex-col gap-5">
           <ContactItem icon={UserRound} label="Contact" value="Youssef Samir" />
           <ContactItem icon={BriefcaseBusiness} label="Position" value="Area Projects Manager" />
-          <ContactItem icon={Phone} label="Phone" value="0558567576" href="tel:0558567576" />
+          <ContactItem
+            icon={Phone}
+            label="WhatsApp"
+            value="0558567576"
+            href={`https://wa.me/${YOUSSEF_WHATSAPP_NUMBER}`}
+          />
           <ContactItem
             icon={Mail}
             label="Email"
