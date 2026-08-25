@@ -63,7 +63,7 @@ export default function HomePage() {
                 <button
                   key={chip.type}
                   onClick={() => navigate(`/library?document_type=${chip.type}`)}
-                  className="rounded-full border border-charcoal-200 bg-white px-4 py-1.5 text-xs font-medium text-charcoal-600 hover:border-brand-500 hover:text-brand-700"
+                  className="rounded-full border border-brand-700 bg-brand-700 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:border-brand-800 hover:bg-brand-800"
                 >
                   {chip.label}
                 </button>
