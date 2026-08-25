@@ -21,12 +21,11 @@ export default function AboutPage() {
         <div className="lg:col-span-2">
           <h2 className="font-display text-xl font-bold text-charcoal-950">Our Story</h2>
           <p className="mt-3 text-sm leading-relaxed text-charcoal-600">
-            Placeholder copy: detailed company history was not supplied for this build pass. Tahweel
-            positions itself around the tagline "Superior Sanitary Solutions" and "Saudi Made — German
-            Technology" — manufacturing PPR, UPVC, PVC and acoustic Silent pipe systems, alongside
-            sanitary fixtures and drainage accessories, for residential, commercial and hospitality
-            projects across Saudi Arabia. This section should be replaced with verified company copy
-            before production launch.
+            Tahweel Integrated Company provides Saudi-made sanitary piping and drainage solutions
+            for residential, commercial, and hospitality projects. Our portfolio includes PPR,
+            UPVC, PVC and acoustic Silent pipe systems, alongside sanitary fixtures and drainage
+            accessories. By combining local manufacturing with German-derived processes, we deliver
+            coordinated solutions for Saudi Arabia's construction sector.
           </p>
 
           <h2 className="mt-10 font-display text-xl font-bold text-charcoal-950">Manufacturing Standards</h2>
