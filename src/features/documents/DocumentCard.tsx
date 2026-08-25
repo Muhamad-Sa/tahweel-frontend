@@ -8,6 +8,7 @@ import { documentTypeLabel, formatDate } from "@/utils/format";
 
 export function DocumentCard({ document }: { document: DocumentListItem }) {
   const rev = document.current_revision;
+  const image = document.product?.featured_image || document.cover_image;
 
   return (
     <div className="flex gap-4 rounded border border-charcoal-200 bg-white p-4 transition-shadow hover:shadow-card">
@@ -15,11 +16,11 @@ export function DocumentCard({ document }: { document: DocumentListItem }) {
         to={`/library/${document.slug}`}
         className="flex h-20 w-16 flex-none items-center justify-center overflow-hidden rounded border border-charcoal-100 bg-charcoal-50"
       >
-        {document.cover_image ? (
+        {image ? (
           <img
-            src={document.cover_image}
-            alt=""
-            className="h-full w-full object-cover"
+            src={image}
+            alt={document.product?.name || document.title}
+            className="h-full w-full object-contain p-1"
             loading="lazy"
           />
         ) : (

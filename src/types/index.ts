@@ -117,7 +117,7 @@ export interface DocumentListItem {
   language: "en" | "ar" | "en_ar";
   category: CategoryMini | null;
   section: DocumentSection | null;
-  product: { id: number; name: string; slug: string } | null;
+  product: { id: number; name: string; slug: string; featured_image: string | null } | null;
   cover_image: string | null;
   current_revision: DocumentRevision | null;
   featured: boolean;

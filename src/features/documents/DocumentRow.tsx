@@ -7,13 +7,19 @@ import { documentTypeLabel, formatDate, languageLabel } from "@/utils/format";
 
 export function DocumentRow({ document }: { document: DocumentListItem }) {
   const rev = document.current_revision;
+  const image = document.product?.featured_image || document.cover_image;
 
   return (
     <div className="flex flex-col gap-3 border-b border-charcoal-100 py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-start gap-3">
         <div className="flex h-12 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded border border-charcoal-100 bg-charcoal-50">
-          {document.cover_image ? (
-            <img src={document.cover_image} alt="" className="h-full w-full object-cover" loading="lazy" />
+          {image ? (
+            <img
+              src={image}
+              alt={document.product?.name || document.title}
+              className="h-full w-full object-contain p-0.5"
+              loading="lazy"
+            />
           ) : (
             <FileText className="h-4 w-4 text-brand-700" />
           )}
