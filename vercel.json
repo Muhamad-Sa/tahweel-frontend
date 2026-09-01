@@ -14,7 +14,7 @@
   "rewrites": [
     {
       "source": "/document-files/:path*",
-      "destination": "https://github.com/Muhamad-Sa/tahweel-backend/releases/download/documents-v1/:path*"
+      "destination": "/api/document-file?name=:path*"
     },
     {
       "source": "/(.*)",
