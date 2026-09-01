@@ -9,7 +9,9 @@ import {
 } from "lucide-react";
 import {
   GlobalWorkerOptions,
+  PDFDataRangeTransport,
   getDocument,
+  type PDFDocumentLoadingTask,
   type PDFDocumentProxy,
   type RenderTask,
 } from "pdfjs-dist";
@@ -19,6 +21,50 @@ import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 
 GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+
+class DocumentRangeTransport extends PDFDataRangeTransport {
+  private readonly controllers = new Set<AbortController>();
+  private loadedBytes = 0;
+
+  constructor(
+    length: number,
+    private readonly fileUrl: string,
+    private readonly reportProgress: (loaded: number, total: number) => void,
+    private readonly reportError: () => void
+  ) {
+    super(length, null, true);
+  }
+
+  requestDataRange(begin: number, end: number) {
+    const controller = new AbortController();
+    this.controllers.add(controller);
+
+    void fetch(this.fileUrl, {
+      headers: { Range: `bytes=${begin}-${end - 1}` },
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (response.status !== 206) throw new Error("Document range unavailable");
+
+        const chunk = new Uint8Array(await response.arrayBuffer());
+        if (chunk.length === 0) throw new Error("Empty document range");
+
+        this.loadedBytes = Math.min(this.length, this.loadedBytes + chunk.length);
+        this.reportProgress(this.loadedBytes, this.length);
+        this.onDataRange(begin, chunk);
+        this.onDataProgress(this.loadedBytes, this.length);
+      })
+      .catch((requestError) => {
+        if (requestError?.name !== "AbortError") this.reportError();
+      })
+      .finally(() => this.controllers.delete(controller));
+  }
+
+  abort() {
+    for (const controller of this.controllers) controller.abort();
+    this.controllers.clear();
+  }
+}
 
 export function PdfViewer({ fileUrl, title }: { fileUrl: string; title: string }) {
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -50,29 +96,60 @@ export function PdfViewer({ fileUrl, title }: { fileUrl: string; title: string }
     setError("");
     setLoadingProgress(0);
 
-    const loadingTask = getDocument({
-      url: fileUrl,
-      disableStream: true,
-      disableAutoFetch: true,
-      rangeChunkSize: 1024 * 1024,
-    });
+    const headController = new AbortController();
+    let loadingTask: PDFDocumentLoadingTask | undefined;
+    let rangeTransport: DocumentRangeTransport | undefined;
+    let disposed = false;
 
-    loadingTask.onProgress = ({ loaded, total }: { loaded: number; total: number }) => {
-      setLoadingProgress(total > 0 ? Math.round((loaded / total) * 100) : null);
-    };
+    void fetch(fileUrl, { method: "HEAD", signal: headController.signal })
+      .then((response) => {
+        const length = Number(response.headers.get("content-length"));
+        if (!response.ok || !Number.isSafeInteger(length) || length <= 0) {
+          throw new Error("Document metadata unavailable");
+        }
 
-    loadingTask.promise
-      .then((loadedPdf) => {
-        setPdf(loadedPdf);
-        setLoadingProgress(null);
+        rangeTransport = new DocumentRangeTransport(
+          length,
+          fileUrl,
+          (loaded, total) => {
+            if (!disposed) setLoadingProgress(Math.round((loaded / total) * 100));
+          },
+          () => {
+            if (!disposed) {
+              setError("This document could not be loaded in the viewer. Please try again.");
+              setLoadingProgress(null);
+            }
+          }
+        );
+
+        loadingTask = getDocument({
+          range: rangeTransport,
+          length,
+          disableStream: true,
+          disableAutoFetch: true,
+          rangeChunkSize: 1024 * 1024,
+        });
+
+        return loadingTask.promise;
       })
-      .catch(() => {
-        setError("This document could not be loaded in the viewer. Please try again.");
-        setLoadingProgress(null);
+      .then((loadedPdf) => {
+        if (!disposed) {
+          setPdf(loadedPdf);
+          setLoadingProgress(null);
+        }
+      })
+      .catch((loadError) => {
+        if (!disposed && loadError?.name !== "AbortError") {
+          setError("This document could not be loaded in the viewer. Please try again.");
+          setLoadingProgress(null);
+        }
       });
 
     return () => {
-      void loadingTask.destroy();
+      disposed = true;
+      headController.abort();
+      rangeTransport?.abort();
+      if (loadingTask) void loadingTask.destroy();
     };
   }, [fileUrl]);
 
