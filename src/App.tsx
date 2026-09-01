@@ -7,6 +7,7 @@ import AboutPage from "@/pages/AboutPage";
 import CataloguesPage from "@/pages/CataloguesPage";
 import ContactPage from "@/pages/ContactPage";
 import DocumentDetailPage from "@/pages/DocumentDetailPage";
+import DocumentViewerPage from "@/pages/DocumentViewerPage";
 import GenerateSubmittalPage from "@/pages/GenerateSubmittalPage";
 import HomePage from "@/pages/HomePage";
 import MaterialSubmittalsPage from "@/pages/MaterialSubmittalsPage";
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/products/:slug" element={<ProductDetailPage />} />
             <Route path="/library" element={<TechnicalLibraryPage />} />
             <Route path="/library/:slug" element={<DocumentDetailPage />} />
+            <Route path="/library/:slug/view" element={<DocumentViewerPage />} />
             <Route path="/catalogues" element={<CataloguesPage />} />
             <Route path="/material-submittals" element={<MaterialSubmittalsPage />} />
             <Route path="/material-submittals/generate" element={<GenerateSubmittalPage />} />

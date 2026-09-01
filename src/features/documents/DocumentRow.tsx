@@ -1,8 +1,9 @@
 import { Download, Eye, FileText } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
-import { ButtonAnchor } from "@/components/ui/ButtonLink";
+import { ButtonAnchor, ButtonLink } from "@/components/ui/ButtonLink";
 import type { DocumentListItem } from "@/types";
+import { documentViewerPath } from "@/utils/documentViewer";
 import { documentTypeLabel, formatDate, languageLabel } from "@/utils/format";
 
 export function DocumentRow({ document }: { document: DocumentListItem }) {
@@ -43,16 +44,14 @@ export function DocumentRow({ document }: { document: DocumentListItem }) {
       <div className="flex flex-shrink-0 items-center gap-2 sm:ml-4">
         {rev?.file_url ? (
           <>
-            <ButtonAnchor
-              href={rev.file_url}
-              target="_blank"
-              rel="noreferrer"
+            <ButtonLink
+              to={documentViewerPath(document.slug)}
               variant="outline"
               size="sm"
               icon={<Eye className="h-3.5 w-3.5" />}
             >
               View
-            </ButtonAnchor>
+            </ButtonLink>
             <ButtonAnchor
               href={rev.file_url}
               download

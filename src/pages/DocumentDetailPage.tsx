@@ -3,10 +3,11 @@ import { Link, useParams } from "react-router-dom";
 
 import { Badge } from "@/components/ui/Badge";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { ButtonAnchor } from "@/components/ui/ButtonLink";
+import { ButtonAnchor, ButtonLink } from "@/components/ui/ButtonLink";
 import { SkeletonText } from "@/components/ui/Skeleton";
 import { useDocument } from "@/hooks/useDocuments";
 import { documentTypeLabel, formatDate, languageLabel } from "@/utils/format";
+import { documentViewerPath } from "@/utils/documentViewer";
 import NotFoundPage from "./NotFoundPage";
 
 export default function DocumentDetailPage() {
@@ -88,9 +89,12 @@ export default function DocumentDetailPage() {
                         </td>
                         <td className="px-4 py-2.5 text-right">
                           {r.file_url && (
-                            <a href={r.file_url} target="_blank" rel="noreferrer" className="text-brand-700 hover:underline">
+                            <Link
+                              to={documentViewerPath(doc.slug, r.id)}
+                              className="text-brand-700 hover:underline"
+                            >
                               View
-                            </a>
+                            </Link>
                           )}
                         </td>
                       </tr>
@@ -119,9 +123,13 @@ export default function DocumentDetailPage() {
                 <Row label="Format" value={rev.mime_type || "PDF"} />
               </dl>
               <div className="mt-5 flex flex-col gap-2">
-                <ButtonAnchor href={rev.file_url ?? "#"} target="_blank" rel="noreferrer" variant="outline" icon={<Eye className="h-4 w-4" />}>
+                <ButtonLink
+                  to={documentViewerPath(doc.slug)}
+                  variant="outline"
+                  icon={<Eye className="h-4 w-4" />}
+                >
                   View PDF
-                </ButtonAnchor>
+                </ButtonLink>
                 <ButtonAnchor href={rev.file_url ?? "#"} download variant="primary" icon={<Download className="h-4 w-4" />}>
                   Download ({rev.file_size_display})
                 </ButtonAnchor>
