@@ -1,7 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "headers": [
+    {
+      "source": "/document-files/:path*",
+      "headers": [
+        { "key": "Content-Type", "value": "application/pdf" },
+        { "key": "Content-Disposition", "value": "inline" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/document-files/:path*",
+      "destination": "https://github.com/Muhamad-Sa/tahweel-backend/releases/download/documents-v1/:path*"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

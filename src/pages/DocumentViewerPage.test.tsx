@@ -11,6 +11,12 @@ vi.mock("@/hooks/useDocuments", () => ({
   useDocument: vi.fn(),
 }));
 
+vi.mock("@/features/documents/PdfViewer", () => ({
+  PdfViewer: ({ fileUrl, title }: { fileUrl: string; title: string }) => (
+    <div data-testid="pdf-viewer" data-file-url={fileUrl}>{title}</div>
+  ),
+}));
+
 const document: DocumentDetail = {
   id: 1,
   title: "Test Datasheet",
@@ -31,7 +37,7 @@ const document: DocumentDetail = {
     id: 10,
     revision: "Current",
     version: 1,
-    file_url: "https://example.com/current.pdf",
+    file_url: "https://github.com/Muhamad-Sa/tahweel-backend/releases/download/documents-v1/current.pdf",
     original_filename: "current.pdf",
     file_size: 1024,
     file_size_display: "1.0 KB",
@@ -67,10 +73,7 @@ describe("DocumentViewerPage", () => {
       </MemoryRouter>
     );
 
-    const viewer = await screen.findByTitle("Test Datasheet PDF viewer");
-    expect(viewer).toHaveAttribute(
-      "src",
-      "https://drive.google.com/viewerng/viewer?embedded=true&url=https%3A%2F%2Fexample.com%2Fcurrent.pdf"
-    );
+    const viewer = await screen.findByTestId("pdf-viewer");
+    expect(viewer).toHaveAttribute("data-file-url", "/document-files/current.pdf");
   });
 });

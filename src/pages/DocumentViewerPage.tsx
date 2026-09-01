@@ -1,12 +1,17 @@
 import { ArrowLeft, FileText } from "lucide-react";
+import { lazy, Suspense } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { useDocument } from "@/hooks/useDocuments";
-import { embeddedDocumentUrl } from "@/utils/documentViewer";
+import { viewableDocumentUrl } from "@/utils/documentViewer";
 import NotFoundPage from "./NotFoundPage";
+
+const PdfViewer = lazy(() =>
+  import("@/features/documents/PdfViewer").then((module) => ({ default: module.PdfViewer }))
+);
 
 export default function DocumentViewerPage() {
   const { slug } = useParams();
@@ -67,12 +72,9 @@ export default function DocumentViewerPage() {
           <FileText className="h-4 w-4 text-brand-700" aria-hidden="true" />
           Viewing inside Tahweel
         </div>
-        <iframe
-          src={embeddedDocumentUrl(revision.file_url)}
-          title={`${document.title} PDF viewer`}
-          className="h-[75vh] min-h-[520px] w-full bg-white"
-          allow="fullscreen"
-        />
+        <Suspense fallback={<Skeleton className="h-[75vh] min-h-[620px] w-full rounded-none" />}>
+          <PdfViewer fileUrl={viewableDocumentUrl(revision.file_url)} title={document.title} />
+        </Suspense>
       </section>
 
       <p className="mt-3 text-center text-xs text-charcoal-400">

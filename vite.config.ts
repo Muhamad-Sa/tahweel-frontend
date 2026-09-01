@@ -16,6 +16,18 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      "/document-files": {
+        target: "https://github.com",
+        changeOrigin: true,
+        followRedirects: true,
+        rewrite: (requestPath) =>
+          requestPath.replace(
+            /^\/document-files/,
+            "/Muhamad-Sa/tahweel-backend/releases/download/documents-v1"
+          ),
+      },
+    },
   },
   test: {
     environment: "jsdom",
